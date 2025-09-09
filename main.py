@@ -1,9 +1,10 @@
-# main.py - 메인 실행 로직 (거래량 순위 표시 수정)
+# main.py - 메인 실행 로직 (GitHub Actions 지원)
 
 import time
 import gc
 import json
 import os
+import sys
 from datetime import datetime
 
 from api.bithumb_client import BithumbClient
@@ -157,7 +158,13 @@ class TradingSignalBot:
         self.cleanup()
     
     def show_countdown_with_animation(self, total_seconds):
-        """카운트다운과 애니메이션 표시"""
+        """카운트다운과 애니메이션 표시 (GitHub Actions에서는 건너뛰기)"""
+        # GitHub Actions 환경에서는 애니메이션 없이 대기만
+        if os.getenv('GITHUB_ACTIONS'):
+            print(f"💤 {total_seconds//60}분 대기 중...")
+            time.sleep(total_seconds)
+            return
+        
         animation_chars = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏']
         
         for remaining in range(total_seconds, 0, -1):
@@ -227,8 +234,29 @@ class TradingSignalBot:
         print("✅ 리소스 정리 완료")
 
 def main():
-    """메인 실행 함수"""
+    """메인 실행 함수 (GitHub Actions 지원)"""
     try:
+        # GitHub Actions 환경에서는 자동으로 1회 스캔 실행
+        if os.getenv('GITHUB_ACTIONS'):
+            print("🔄 GitHub Actions 환경에서 자동 실행")
+            bot = TradingSignalBot()
+            bot.run_once()
+            return
+        
+        # 명령행 인수 확인
+        if len(sys.argv) > 1:
+            if '--scan-once' in sys.argv:
+                print("📝 1회 스캔 모드")
+                bot = TradingSignalBot()
+                bot.run_once()
+                return
+            elif '--continuous' in sys.argv:
+                print("🔄 연속 스캔 모드")
+                bot = TradingSignalBot()
+                bot.run_continuous()
+                return
+        
+        # 대화형 모드 (로컬 실행)
         print("🎯 빗썸 상승신호 알림 시스템")
         print("="*50)
         print("1. 1회 스캔")
