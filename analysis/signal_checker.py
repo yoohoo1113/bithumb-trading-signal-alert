@@ -18,16 +18,22 @@ class SignalChecker:
             
             # 현재 시점에서는 돌파 상태여야 함
             latest = recent_data.iloc[-1]
-            ma9_above = latest['ma9'] > latest['ma99'] and latest['ma9'] > latest['ma200']
-            ma25_above = latest['ma25'] > latest['ma99'] and latest['ma25'] > latest['ma200']
+            
+            # 200일선이 없을 경우 99일선으로 대체
+            target_ma_long = latest['ma200'] if not pd.isna(latest['ma200']) else latest['ma99']
+            
+            ma9_above = latest['ma9'] > latest['ma99'] and latest['ma9'] > target_ma_long
+            ma25_above = latest['ma25'] > latest['ma99'] and latest['ma25'] > target_ma_long
             
             if not (ma9_above and ma25_above):
                 return False
             
             # 10시간 전에는 돌파하지 않은 상태였는지 확인
             oldest = recent_data.iloc[0]
-            ma9_was_below = oldest['ma9'] <= oldest['ma99'] or oldest['ma9'] <= oldest['ma200']
-            ma25_was_below = oldest['ma25'] <= oldest['ma99'] or oldest['ma25'] <= oldest['ma200']
+            oldest_target_ma = oldest['ma200'] if not pd.isna(oldest['ma200']) else oldest['ma99']
+            
+            ma9_was_below = oldest['ma9'] <= oldest['ma99'] or oldest['ma9'] <= oldest_target_ma
+            ma25_was_below = oldest['ma25'] <= oldest['ma99'] or oldest['ma25'] <= oldest_target_ma
             
             return ma9_was_below or ma25_was_below
             
