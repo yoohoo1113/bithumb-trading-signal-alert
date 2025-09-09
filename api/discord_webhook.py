@@ -1,8 +1,8 @@
-# api/discord_webhook.py - 거래량 순위 표시로 수정
+# api/discord_webhook.py - 거래량 순위 표시로 수정 (한국 시간 적용)
 
 import requests
 import json
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from config.settings import settings
 
 class DiscordWebhook:
@@ -11,6 +11,13 @@ class DiscordWebhook:
     def __init__(self):
         self.webhook_url = settings.DISCORD_WEBHOOK_URL
         self.session = None
+    
+    def get_korean_time(self):
+        """한국 시간(KST) 반환 - GitHub Actions UTC 환경 고려"""
+        utc_now = datetime.utcnow()
+        kst = timezone(timedelta(hours=9))
+        korean_time = utc_now.replace(tzinfo=timezone.utc).astimezone(kst)
+        return korean_time.strftime('%Y-%m-%d %H:%M:%S')
     
     def _get_session(self):
         """지연 초기화: 필요할 때만 세션 생성"""
@@ -72,8 +79,8 @@ class DiscordWebhook:
                 print("웹훅 URL이 설정되지 않음")
                 return False
             
-            # 현재 시간
-            current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            # 현재 시간 (한국 시간으로 수정)
+            current_time = self.get_korean_time()
             
             # 기본 정보 추출
             market = coin_data['market']
@@ -145,7 +152,7 @@ class DiscordWebhook:
                         }
                     ],
                     "footer": {
-                        "text": f"탐지 시간: {current_time}"
+                        "text": f"탐지 시간: {current_time} KST"
                     },
                     "thumbnail": {
                         "url": "https://cdn-icons-png.flaticon.com/512/1055/1055673.png"
@@ -180,7 +187,7 @@ class DiscordWebhook:
                     "description": "빗썸 상승신호 알림 시스템 테스트입니다.\n시스템이 정상적으로 작동 중입니다.",
                     "color": 0x3498db,  # 파란색
                     "footer": {
-                        "text": f"⏰ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+                        "text": f"⏰ {self.get_korean_time()} KST"
                     }
                 }]
             }
