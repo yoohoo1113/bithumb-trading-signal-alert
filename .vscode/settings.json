@@ -1,0 +1,14 @@
+{
+    "python.defaultInterpreter": "/usr/bin/python3",
+    "python.terminal.activateEnvironment": false,
+    "python.linting.enabled": false,
+    "python.formatting.provider": "none",
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/*.pyc": true
+    },
+    "editor.formatOnSave": false,
+    "python.analysis.autoImportCompletions": false,
+    "python.analysis.diagnosticMode": "off",
+    "extensions.ignoreRecommendations": true
+}

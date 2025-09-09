@@ -1,0 +1,18 @@
+# 🔥 맥북 발열 방지 - 초경량 라이브러리만 사용
+
+# 필수 핵심 라이브러리만
+requests==2.31.0        # API 호출
+python-dotenv==1.0.0    # 환경변수
+pandas==2.1.0           # 데이터 처리 (경량화)
+numpy==1.24.3           # 수치 계산
+
+# 기술적 분석 (가벼운 버전)
+ta==0.10.2              # talib 대신 가벼운 ta 사용
+
+# 발열 방지를 위해 제거된 라이브러리들:
+# APScheduler (제거) - while 루프로 대체
+# psutil (제거) - 시스템 모니터링 불필요
+# discord-webhook (제거) - requests로 직접 구현
+# talib-binary (제거) - ta로 대체
+# schedule (제거) - 단순 time.sleep 사용
+# loguru (제거) - 기본 logging 사용
